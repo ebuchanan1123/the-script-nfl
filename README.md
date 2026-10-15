@@ -1,6 +1,8 @@
 # The Script
 
-> Leakage-aware NFL player forecasting with multi-position machine learning, a FastAPI inference service, and a React dashboard. An optional static mode serves precomputed forecast releases for low-cost deployment.
+> The Script turns historical NFL data into matchup-specific player forecasts. It combines leakage-aware feature engineering with Ridge, XGBoost, and neural models, then delivers WR, QB, RB, and TE projections through an interactive React dashboard or lightweight static JSON releases.
+
+The goal is not just to train a model—it is to build an end-to-end forecasting system: prepare trustworthy data, model player outcomes in football context, evaluate on future seasons, and make the results easy to explore.
 
 ## Full Application
 
