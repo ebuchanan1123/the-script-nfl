@@ -1,0 +1,290 @@
+{
+  "candidate_names": [
+    "ridge",
+    "xgboost",
+    "numerical_mlp",
+    "decomposition"
+  ],
+  "weights": {
+    "ridge": 7.234558528048986e-18,
+    "xgboost": 0.04723304563862751,
+    "numerical_mlp": 0.577190321323598,
+    "decomposition": 0.3755766330377745
+  },
+  "weight_fit_season": 2024,
+  "decomposition": {
+    "formula": "targets * catch_rate * yards_per_reception",
+    "features": [
+      "yards_last_game",
+      "yards_avg_last_3",
+      "yards_avg_last_5",
+      "yards_avg_last_16",
+      "targets_avg_last_3",
+      "targets_avg_last_5",
+      "targets_avg_last_16",
+      "target_share_last_game",
+      "target_share_avg_last_3",
+      "target_share_avg_last_5",
+      "target_share_avg_last_16",
+      "air_yards_share_last_game",
+      "air_yards_share_avg_last_3",
+      "air_yards_share_avg_last_5",
+      "wopr_last_game",
+      "wopr_avg_last_3",
+      "wopr_avg_last_5",
+      "receptions_avg_last_5",
+      "receptions_avg_last_16",
+      "snap_share_last_game",
+      "snap_share_avg_last_3",
+      "season_yards_per_game_before_game",
+      "games_played_before_game",
+      "home_game",
+      "days_rest",
+      "depth_chart_rank",
+      "depth_chart_rank_healthy_baseline",
+      "depth_chart_rank_change",
+      "depth_chart_available",
+      "returning_team_target_share",
+      "vacated_team_target_share",
+      "active_teammate_target_share",
+      "team_role_available",
+      "games_with_current_team",
+      "new_team_flag",
+      "target_share_delta_last_game",
+      "target_share_delta_last_3",
+      "snap_share_delta_last_game",
+      "snap_share_delta_last_3",
+      "role_rank_target_share_delta",
+      "offense_pass_rate_avg_last_3",
+      "offense_pass_rate_avg_last_5",
+      "offense_pass_rate_season_to_date",
+      "neutral_pass_rate_avg_last_3",
+      "neutral_pass_rate_avg_last_5",
+      "team_wr_target_share_avg_last_3",
+      "team_wr_target_share_avg_last_5",
+      "team_wr_target_share_season_to_date",
+      "team_wr_target_concentration_avg_last_5",
+      "player_questionable",
+      "player_out_or_doubtful",
+      "player_practice_limited",
+      "player_practice_dnp",
+      "teammate_questionable_target_share",
+      "teammate_out_or_doubtful_target_share",
+      "injury_report_available",
+      "team_implied_margin",
+      "game_total_line",
+      "team_implied_points",
+      "team_is_favorite",
+      "game_is_outdoors",
+      "game_temperature",
+      "game_wind",
+      "qb_epa_avg_last_3",
+      "qb_cpoe_avg_last_3",
+      "qb_completion_rate_avg_last_3",
+      "primary_qb_changed_last_game",
+      "qb_scramble_rate_avg_last_5",
+      "qb_pressure_rate_avg_last_5",
+      "qb_checkdown_rate_avg_last_5",
+      "qb_receiver_target_share_avg_last_5",
+      "qb_receiver_catch_rate_avg_last_5",
+      "qb_receiver_yards_per_target_avg_last_5",
+      "deep_target_rate_avg_last_3",
+      "deep_target_rate_avg_last_5",
+      "red_zone_target_share_avg_last_3",
+      "red_zone_target_share_avg_last_5",
+      "end_zone_targets_avg_last_5",
+      "adot_avg_last_3",
+      "adot_avg_last_5",
+      "team_trailing_play_rate_avg_last_3",
+      "team_trailing_play_rate_avg_last_5",
+      "team_td_drive_rate_avg_last_3",
+      "team_td_drive_rate_avg_last_5",
+      "team_dropbacks_avg_last_3",
+      "team_dropbacks_avg_last_5",
+      "opponent_td_drive_rate_allowed_avg_last_3",
+      "opponent_td_drive_rate_allowed_avg_last_5",
+      "qb_dropbacks_avg_last_3",
+      "qb_dropbacks_avg_last_5",
+      "qb_fantasy_points_per_dropback_avg_last_3",
+      "qb_fantasy_points_per_dropback_avg_last_5",
+      "opponent_wr_yards_allowed_last_game",
+      "opponent_wr_yards_allowed_avg_last_3",
+      "opponent_wr_yards_allowed_avg_last_5",
+      "opponent_wr_yards_allowed_season_to_date",
+      "opponent_wr_ppr_points_allowed_last_game",
+      "opponent_wr_ppr_points_allowed_avg_last_3",
+      "opponent_wr_ppr_points_allowed_avg_last_5",
+      "opponent_wr_ppr_points_allowed_season_to_date"
+    ],
+    "training_seasons": "2016-2023"
+  },
+  "rolling_validation": [
+    {
+      "weight_fit_weeks": "1-6",
+      "score_weeks": "7-10",
+      "rows": 523,
+      "weights": {
+        "ridge": 5.585103467259986e-10,
+        "xgboost": 6.445500012266691e-19,
+        "numerical_mlp": 0.6307773083710312,
+        "decomposition": 0.3692226910704585
+      },
+      "ensemble_mae": 21.418904147719278,
+      "mlp_mae": 21.347423814735723
+    },
+    {
+      "weight_fit_weeks": "1-10",
+      "score_weeks": "11-14",
+      "rows": 486,
+      "weights": {
+        "ridge": 2.4247071649840715e-19,
+        "xgboost": 0.11376868872025062,
+        "numerical_mlp": 0.7045849075470517,
+        "decomposition": 0.1816464037326977
+      },
+      "ensemble_mae": 20.0018279038648,
+      "mlp_mae": 20.186162245862278
+    },
+    {
+      "weight_fit_weeks": "1-14",
+      "score_weeks": "15-18",
+      "rows": 556,
+      "weights": {
+        "ridge": 6.016097457132809e-17,
+        "xgboost": 0.048731582262910154,
+        "numerical_mlp": 0.5983993857053085,
+        "decomposition": 0.35286903203178127
+      },
+      "ensemble_mae": 19.39638778490187,
+      "mlp_mae": 19.55613208079724
+    }
+  ],
+  "validation": {
+    "ensemble": {
+      "rows": 2353,
+      "mae": 20.337627869750985,
+      "rmse": 29.20933064381146,
+      "median_absolute_error": 13.385516769624203,
+      "common_history_cohort": {
+        "rows": 2302,
+        "mae": 20.455310507261743,
+        "rmse": 29.386515750247217,
+        "median_absolute_error": 13.517537636082018
+      }
+    },
+    "candidates": {
+      "ridge": {
+        "rows": 2353,
+        "mae": 21.387678711352528,
+        "rmse": 29.05358057856644,
+        "median_absolute_error": 16.326461791992188,
+        "common_history_cohort": {
+          "rows": 2302,
+          "mae": 21.43739046085202,
+          "rmse": 29.206484442483614,
+          "median_absolute_error": 16.22082805633545
+        }
+      },
+      "xgboost": {
+        "rows": 2353,
+        "mae": 21.574778921189736,
+        "rmse": 29.340139264456322,
+        "median_absolute_error": 16.040443420410156,
+        "common_history_cohort": {
+          "rows": 2302,
+          "mae": 21.699293922487286,
+          "rmse": 29.52911449316049,
+          "median_absolute_error": 16.07579231262207
+        }
+      },
+      "numerical_mlp": {
+        "rows": 2353,
+        "mae": 20.456527245865445,
+        "rmse": 29.45876915312998,
+        "median_absolute_error": 13.529388427734375,
+        "common_history_cohort": {
+          "rows": 2302,
+          "mae": 20.577840785349483,
+          "rmse": 29.633309291578545,
+          "median_absolute_error": 13.76851511001587
+        }
+      },
+      "decomposition": {
+        "rows": 2353,
+        "mae": 20.52384529863134,
+        "rmse": 29.473300179386595,
+        "median_absolute_error": 13.742927551269531,
+        "common_history_cohort": {
+          "rows": 2302,
+          "mae": 20.642095774298877,
+          "rmse": 29.656936576945018,
+          "median_absolute_error": 13.81080150604248
+        }
+      }
+    }
+  },
+  "test": {
+    "ensemble": {
+      "rows": 2368,
+      "mae": 20.051173153280025,
+      "rmse": 28.039770142228004,
+      "median_absolute_error": 13.783534204837277,
+      "common_history_cohort": {
+        "rows": 2320,
+        "mae": 20.253505052909457,
+        "rmse": 28.24660933913071,
+        "median_absolute_error": 13.976836435751933
+      }
+    },
+    "candidates": {
+      "ridge": {
+        "rows": 2368,
+        "mae": 20.43783559348132,
+        "rmse": 27.99909446321559,
+        "median_absolute_error": 15.244335174560547,
+        "common_history_cohort": {
+          "rows": 2320,
+          "mae": 20.581382472761746,
+          "rmse": 28.19258981028051,
+          "median_absolute_error": 15.341043472290039
+        }
+      },
+      "xgboost": {
+        "rows": 2368,
+        "mae": 20.77260818513664,
+        "rmse": 27.89371938722841,
+        "median_absolute_error": 15.62028694152832,
+        "common_history_cohort": {
+          "rows": 2320,
+          "mae": 20.92758485736518,
+          "rmse": 28.08387575161953,
+          "median_absolute_error": 15.791199684143066
+        }
+      },
+      "numerical_mlp": {
+        "rows": 2368,
+        "mae": 20.50702967572756,
+        "rmse": 28.355031214893536,
+        "median_absolute_error": 14.549908638000488,
+        "common_history_cohort": {
+          "rows": 2320,
+          "mae": 20.710955023020507,
+          "rmse": 28.56180304965801,
+          "median_absolute_error": 14.812784671783447
+        }
+      },
+      "decomposition": {
+        "rows": 2368,
+        "mae": 19.81338405010172,
+        "rmse": 28.441675215127336,
+        "median_absolute_error": 13.64734411239624,
+        "common_history_cohort": {
+          "rows": 2320,
+          "mae": 20.016184147936592,
+          "rmse": 28.654591457441004,
+          "median_absolute_error": 13.823906660079956
+        }
+      }
+    }
+  }
+}

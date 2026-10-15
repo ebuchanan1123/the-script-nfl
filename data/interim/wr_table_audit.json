@@ -1,0 +1,47 @@
+{
+  "dataset": "data/processed/wr_player_games.parquet",
+  "prediction_contract": {
+    "prediction_time_hours_before_kickoff": 24,
+    "target": "receiving_yards",
+    "position": "WR",
+    "season_type": "REG",
+    "seasons": [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
+  },
+  "quality": {
+    "rows": 22641,
+    "unique_player_games": 22641,
+    "unique_players": 681,
+    "null_game_ids": 0,
+    "null_player_ids": 0,
+    "first_season": 2016,
+    "last_season": 2025,
+    "minimum_receiving_yards": -13,
+    "maximum_receiving_yards": 300,
+    "minimum_snap_share": 0.01,
+    "maximum_snap_share": 1.0,
+    "raw_wr_rows": 23610,
+    "snap_verified_wr_rows": 22641,
+    "snap_match_rate": 0.958958,
+    "null_yards_avg_last_5": 681,
+    "scorable_feature_rows": 21960
+  },
+  "rows_by_season": {
+    "2016": 2193,
+    "2017": 2157,
+    "2018": 2132,
+    "2019": 2152,
+    "2020": 2202,
+    "2021": 2391,
+    "2022": 2299,
+    "2023": 2394,
+    "2024": 2353,
+    "2025": 2368
+  },
+  "notes": [
+    "Positive offensive snaps define participation.",
+    "PFR snap IDs are reconciled to GSIS IDs through the nflverse player registry.",
+    "Negative receiving yards are legitimate outcomes.",
+    "Every rolling feature is shifted one game before aggregation.",
+    "The recent-five-game baseline is the only evaluated model."
+  ]
+}

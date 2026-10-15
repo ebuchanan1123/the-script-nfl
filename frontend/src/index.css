@@ -1,0 +1,28 @@
+:root {
+  font-family: "Avenir Next", "Helvetica Neue", sans-serif;
+  color: #18212d;
+  background: #f4f6f8;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  --navy: #102438;
+  --navy-2: #18344c;
+  --green: #1c6c4c;
+  --green-2: #27845f;
+  --green-soft: #e7f1ec;
+  --surface: #ffffff;
+  --canvas: #f4f6f8;
+  --ink: #18212d;
+  --muted: #657180;
+  --line: #dbe1e6;
+  --line-dark: #c9d1d8;
+  --danger: #a63c34;
+  letter-spacing: 0;
+}
+* { box-sizing: border-box; }
+html { min-width: 320px; background: var(--canvas); }
+body { margin: 0; min-width: 320px; min-height: 100vh; }
+button, input, select { font: inherit; letter-spacing: 0; }
+button { cursor: pointer; }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid rgba(39, 132, 95, .22); outline-offset: 1px; }
+#root { min-height: 100vh; }

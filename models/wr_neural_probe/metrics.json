@@ -1,0 +1,27 @@
+{
+  "model": "numerical_mlp",
+  "architecture": [
+    12,
+    64,
+    32,
+    1
+  ],
+  "loss": "HuberLoss",
+  "optimizer": "AdamW",
+  "learning_rate": 0.001,
+  "batch_size": 128,
+  "epochs_completed": 2,
+  "best_validation_loss": 20.799482345581055,
+  "validation": {
+    "rows": 2353,
+    "mae": 21.293886507616314,
+    "rmse": 30.812637507861687,
+    "median_absolute_error": 14.114486694335938
+  },
+  "test": {
+    "rows": 2368,
+    "mae": 20.446547501846343,
+    "rmse": 29.30009812077036,
+    "median_absolute_error": 13.492446899414062
+  }
+}

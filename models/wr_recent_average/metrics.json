@@ -1,0 +1,18 @@
+{
+  "model": "recent_five_game_average",
+  "prediction_column": "yards_avg_last_5",
+  "target_column": "receiving_yards",
+  "train_rows": 17920,
+  "validation": {
+    "rows": 2302,
+    "mae": 22.50298291340863,
+    "rmse": 31.197880015215276,
+    "median_absolute_error": 16.2
+  },
+  "test": {
+    "rows": 2320,
+    "mae": 21.74375,
+    "rmse": 29.522225380672154,
+    "median_absolute_error": 16.0
+  }
+}
