@@ -54,6 +54,10 @@ def test_shifted_windows_use_only_prior_player_games() -> None:
     assert featured[5, "yards_avg_last_16"] == 30
     assert featured[5, "targets_avg_last_5"] == 4
     assert featured[5, "targets_avg_last_16"] == 4
+    assert featured[5, "targets_recency_5"] == pytest.approx(
+        sum((index + 2) * (0.75**lag) for lag, index in enumerate(range(4, -1, -1)))
+        / sum(0.75**lag for lag in range(5))
+    )
     assert featured[5, "target_share_last_game"] == 0.18
     assert featured[5, "target_share_avg_last_5"] == pytest.approx(0.14)
     assert featured[5, "air_yards_share_avg_last_3"] == pytest.approx(0.24)

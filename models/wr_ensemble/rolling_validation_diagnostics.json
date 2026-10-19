@@ -1,0 +1,364 @@
+{
+  "protocol": "Expanding-window 2024 validation; fit blend weights only on earlier weeks; score weeks 7-18.",
+  "population": "Snap-verified WR game participants; bye/inactive players are outside this target contract.",
+  "scored_weeks": "7-18",
+  "scored_rows": 1565,
+  "common_cohort_rows": 1547,
+  "common_cohort": "Rows with a pregame yards_avg_last_5 baseline; every model and baseline metric uses this same cohort.",
+  "folds": [
+    {
+      "fit_weeks": "1-6",
+      "score_weeks": "7-10",
+      "scored_rows": 523,
+      "common_cohort_rows": 513,
+      "weights": {
+        "ridge": 2.2400183706978776e-17,
+        "xgboost": 2.6962403468223134e-18,
+        "numerical_mlp": 0.6307773215573068,
+        "decomposition": 0.36922267844269324
+      },
+      "metrics": {
+        "ridge": {
+          "rows": 513,
+          "mae": 22.395444643195376,
+          "rmse": 30.114454767561384,
+          "bias": 1.8650781806217067,
+          "median_absolute_error": 16.4219913482666
+        },
+        "xgboost": {
+          "rows": 513,
+          "mae": 22.160918684730753,
+          "rmse": 30.156091712809726,
+          "bias": 2.0592684373985723,
+          "median_absolute_error": 15.800041198730469
+        },
+        "numerical_mlp": {
+          "rows": 513,
+          "mae": 21.575490649971115,
+          "rmse": 30.435404346590342,
+          "bias": -4.012346420662213,
+          "median_absolute_error": 15.43194580078125
+        },
+        "decomposition": {
+          "rows": 513,
+          "mae": 22.086284900980967,
+          "rmse": 31.14405933672862,
+          "bias": -2.1442504209587914,
+          "median_absolute_error": 15.289299011230469
+        },
+        "rolling_blend": {
+          "rows": 513,
+          "mae": 21.651206813495268,
+          "rmse": 30.523489378630657,
+          "bias": -3.3226030120636327,
+          "median_absolute_error": 15.346085217204584
+        },
+        "recent_average": {
+          "rows": 513,
+          "mae": 22.700747238466537,
+          "rmse": 31.39347397897695,
+          "bias": 0.8710526315789479,
+          "median_absolute_error": 16.2
+        }
+      },
+      "bias_calibration": null
+    },
+    {
+      "fit_weeks": "1-10",
+      "score_weeks": "11-14",
+      "scored_rows": 486,
+      "common_cohort_rows": 484,
+      "weights": {
+        "ridge": 3.558935596370902e-18,
+        "xgboost": 0.11376876735990547,
+        "numerical_mlp": 0.7045857628252655,
+        "decomposition": 0.18164546981482904
+      },
+      "metrics": {
+        "ridge": {
+          "rows": 484,
+          "mae": 20.982410486079445,
+          "rmse": 29.49925211824441,
+          "bias": -2.7477626170008635,
+          "median_absolute_error": 15.162260055541992
+        },
+        "xgboost": {
+          "rows": 484,
+          "mae": 21.289954636215178,
+          "rmse": 29.646406528463594,
+          "bias": -2.199371196514319,
+          "median_absolute_error": 15.837776184082031
+        },
+        "numerical_mlp": {
+          "rows": 484,
+          "mae": 20.233240083968344,
+          "rmse": 30.38284912200032,
+          "bias": -8.52800054688099,
+          "median_absolute_error": 12.501633644104004
+        },
+        "decomposition": {
+          "rows": 484,
+          "mae": 19.824178828449906,
+          "rmse": 29.655420420537002,
+          "bias": -6.225739340290181,
+          "median_absolute_error": 13.083351135253906
+        },
+        "rolling_blend": {
+          "rows": 484,
+          "mae": 20.050968992685604,
+          "rmse": 29.917839482641824,
+          "bias": -7.38980486810441,
+          "median_absolute_error": 12.620188548151617
+        },
+        "recent_average": {
+          "rows": 484,
+          "mae": 21.979958677685953,
+          "rmse": 30.57409215889622,
+          "bias": -1.8814049586776858,
+          "median_absolute_error": 16.4
+        }
+      },
+      "bias_calibration": {
+        "fit_on_prior_scored_weeks": true,
+        "correction_yards": 3.3226030120636327,
+        "metrics": {
+          "rows": 484,
+          "mae": 20.32869328152838,
+          "rmse": 29.27473371797332,
+          "bias": -4.0672018560407786,
+          "median_absolute_error": 13.187177961237072
+        }
+      }
+    },
+    {
+      "fit_weeks": "1-14",
+      "score_weeks": "15-18",
+      "scored_rows": 556,
+      "common_cohort_rows": 550,
+      "weights": {
+        "ridge": 1.767158598017594e-17,
+        "xgboost": 0.048731587920820364,
+        "numerical_mlp": 0.5983990837603804,
+        "decomposition": 0.3528693283187992
+      },
+      "metrics": {
+        "ridge": {
+          "rows": 550,
+          "mae": 20.074448901089756,
+          "rmse": 28.112567572457724,
+          "bias": -0.025709776444868607,
+          "median_absolute_error": 15.09613037109375
+        },
+        "xgboost": {
+          "rows": 550,
+          "mae": 20.79235502503135,
+          "rmse": 28.518918188330748,
+          "bias": 0.20919290976090865,
+          "median_absolute_error": 15.966280460357666
+        },
+        "numerical_mlp": {
+          "rows": 550,
+          "mae": 19.532657954530283,
+          "rmse": 28.724656306957343,
+          "bias": -5.132088833559643,
+          "median_absolute_error": 12.752916812896729
+        },
+        "decomposition": {
+          "rows": 550,
+          "mae": 19.427887030575764,
+          "rmse": 28.293559618911033,
+          "bias": -3.758635433268818,
+          "median_absolute_error": 12.345635414123535
+        },
+        "rolling_blend": {
+          "rows": 550,
+          "mae": 19.366657059358293,
+          "rmse": 28.347537155475294,
+          "bias": -4.387150113837351,
+          "median_absolute_error": 11.85105206473364
+        },
+        "recent_average": {
+          "rows": 550,
+          "mae": 22.091181818181816,
+          "rmse": 31.026029777226956,
+          "bias": 1.246818181818182,
+          "median_absolute_error": 15.9
+        }
+      },
+      "bias_calibration": {
+        "fit_on_prior_scored_weeks": true,
+        "correction_yards": 5.29705205752375,
+        "metrics": {
+          "rows": 550,
+          "mae": 20.147086045890983,
+          "rmse": 28.02077261973398,
+          "bias": 0.9099019436863994,
+          "median_absolute_error": 14.74788858200264
+        }
+      }
+    }
+  ],
+  "overall": {
+    "ridge": {
+      "rows": 1547,
+      "mae": 21.12818143039499,
+      "rmse": 29.22267376729926,
+      "bias": -0.250337670985236,
+      "median_absolute_error": 15.767282485961914
+    },
+    "xgboost": {
+      "rows": 1547,
+      "mae": 21.401864636691833,
+      "rmse": 29.4228027358079,
+      "bias": 0.06914360028509178,
+      "median_absolute_error": 15.94913101196289
+    },
+    "numerical_mlp": {
+      "rows": 1547,
+      "mae": 20.429267471924703,
+      "rmse": 29.82166464961793,
+      "bias": -5.823228724594647,
+      "median_absolute_error": 13.467545747756958
+    },
+    "decomposition": {
+      "rows": 1547,
+      "mae": 20.4334224783385,
+      "rmse": 29.688378388538876,
+      "bias": -3.9951569456691387,
+      "median_absolute_error": 13.525678634643555
+    },
+    "rolling_blend": {
+      "rows": 1547,
+      "mae": 20.33833191365867,
+      "rmse": 29.57511539858508,
+      "bias": -4.973557507409,
+      "median_absolute_error": 13.395334338969775
+    },
+    "recent_average": {
+      "rows": 1547,
+      "mae": 22.258521870286575,
+      "rmse": 31.00822918580003,
+      "bias": 0.14350355526826147,
+      "median_absolute_error": 16.0
+    }
+  },
+  "bias_calibration_on_later_folds": {
+    "protocol": "Fit one additive residual correction on prior out-of-fold validation weeks only; apply it to the next fold.",
+    "score_weeks": "11-18",
+    "rows": 1034,
+    "uncalibrated_blend": {
+      "rows": 1034,
+      "mae": 19.686973283468944,
+      "rmse": 29.093125675688842,
+      "bias": -5.792648083919804,
+      "median_absolute_error": 12.314975266095082
+    },
+    "calibrated_blend": {
+      "rows": 1034,
+      "mae": 20.232093688104236,
+      "rmse": 28.614574923641367,
+      "bias": -1.4198062178880249,
+      "median_absolute_error": 13.830822859875648
+    },
+    "recent_average": {
+      "rows": 1034,
+      "mae": 22.039119922630558,
+      "rmse": 30.815309659713424,
+      "bias": -0.21745647969052215,
+      "median_absolute_error": 16.0
+    }
+  },
+  "by_pregame_usage_tier": {
+    "high (8+ targets/game)": {
+      "numerical_mlp": {
+        "rows": 213,
+        "mae": 30.60395586434664,
+        "rmse": 41.50059812286797,
+        "bias": -7.118172703774323,
+        "median_absolute_error": 24.302032470703125
+      },
+      "decomposition": {
+        "rows": 213,
+        "mae": 30.95284613309332,
+        "rmse": 41.54137323783332,
+        "bias": -3.7055724058912394,
+        "median_absolute_error": 25.33550262451172
+      },
+      "rolling_blend": {
+        "rows": 213,
+        "mae": 30.446416888017566,
+        "rmse": 41.171823343060616,
+        "bias": -6.081138219674396,
+        "median_absolute_error": 23.255308553474364
+      },
+      "yards_avg_last_5": {
+        "rows": 213,
+        "mae": 34.424882629107984,
+        "rmse": 43.83409021285525,
+        "bias": 5.279342723004695,
+        "median_absolute_error": 27.400000000000006
+      }
+    },
+    "low (<4 targets/game)": {
+      "numerical_mlp": {
+        "rows": 782,
+        "mae": 13.892614963033315,
+        "rmse": 21.83256838127047,
+        "bias": -5.909386567981042,
+        "median_absolute_error": 8.551555156707764
+      },
+      "decomposition": {
+        "rows": 782,
+        "mae": 13.626131312835895,
+        "rmse": 21.265019380962276,
+        "bias": -4.989745337149257,
+        "median_absolute_error": 8.590758800506592
+      },
+      "rolling_blend": {
+        "rows": 782,
+        "mae": 13.797413952507615,
+        "rmse": 21.504045315953288,
+        "bias": -5.252036402308616,
+        "median_absolute_error": 8.607064221314234
+      },
+      "yards_avg_last_5": {
+        "rows": 782,
+        "mae": 15.02730179028133,
+        "rmse": 22.47725062389856,
+        "bias": -2.4542838874680304,
+        "median_absolute_error": 10.2
+      }
+    },
+    "mid (4-8 targets/game)": {
+      "numerical_mlp": {
+        "rows": 552,
+        "mae": 25.76342260664788,
+        "rmse": 33.94895340954864,
+        "bias": -5.2014923095703125,
+        "median_absolute_error": 20.221208572387695
+      },
+      "decomposition": {
+        "rows": 552,
+        "mae": 26.01795953080274,
+        "rmse": 34.112272950266195,
+        "bias": -2.697898584863414,
+        "median_absolute_error": 20.58607578277588
+      },
+      "rolling_blend": {
+        "rows": 552,
+        "mae": 25.70423000438635,
+        "rmse": 33.79567738023302,
+        "bias": -4.151664051749526,
+        "median_absolute_error": 19.943187534308283
+      },
+      "yards_avg_last_5": {
+        "rows": 552,
+        "mae": 27.808121980676326,
+        "rmse": 35.1782468069377,
+        "bias": 1.8419384057971016,
+        "median_absolute_error": 22.7
+      }
+    }
+  },
+  "interpretation": "Use this report to select experiments. Do not tune on the 2025 test set."
+}

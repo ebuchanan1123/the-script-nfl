@@ -9,7 +9,9 @@ from sklearn.preprocessing import StandardScaler
 
 from the_script.features.advanced import ADVANCED_FEATURE_COLUMNS, QB_CONTEXT_COLUMNS
 from the_script.features.injuries import INJURY_FEATURE_COLUMNS
+from the_script.features.nextgen import NGS_RECEIVING_FEATURE_COLUMNS
 from the_script.features.opponent import OPPONENT_FEATURE_COLUMNS
+from the_script.features.recency import EXPERIMENTAL_RECENCY_FEATURE_COLUMNS
 from the_script.features.role import ROLE_FEATURE_COLUMNS
 from the_script.features.tendencies import TENDENCY_FEATURE_COLUMNS
 
@@ -22,6 +24,7 @@ BASE_NUMERIC_FEATURES = [
     "targets_avg_last_3",
     "targets_avg_last_5",
     "targets_avg_last_16",
+    "targets_recency_5",
     "target_share_last_game",
     "target_share_avg_last_3",
     "target_share_avg_last_5",
@@ -45,7 +48,15 @@ BASE_NUMERIC_FEATURES = [
     *INJURY_FEATURE_COLUMNS,
     *ADVANCED_FEATURE_COLUMNS,
 ]
-NUMERIC_FEATURES = [*BASE_NUMERIC_FEATURES, *OPPONENT_FEATURE_COLUMNS]
+NUMERIC_FEATURES = [
+    *[
+        feature
+        for feature in BASE_NUMERIC_FEATURES
+        if feature not in NGS_RECEIVING_FEATURE_COLUMNS
+        and feature not in EXPERIMENTAL_RECENCY_FEATURE_COLUMNS
+    ],
+    *OPPONENT_FEATURE_COLUMNS,
+]
 LONG_HORIZON_FEATURES = [
     "yards_avg_last_16",
     "targets_avg_last_16",

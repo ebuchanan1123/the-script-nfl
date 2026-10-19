@@ -4,6 +4,11 @@ import polars as pl
 
 from the_script.data.clean import canonical_team
 from the_script.features.matchup import MATCHUP_FEATURE_COLUMNS, add_matchup_history_features
+from the_script.features.nextgen import (
+    NGS_RECEIVING_FEATURE_COLUMNS,
+    add_nextgen_receiving_features,
+)
+from the_script.features.recency import prior_recency_mean
 
 GAME_CONTEXT_COLUMNS = [
     "team_implied_margin",
@@ -27,10 +32,14 @@ QB_CONTEXT_COLUMNS = [
     "qb_receiver_yards_per_target_avg_last_5",
 ]
 USAGE_QUALITY_COLUMNS = [
+    "pbp_target_share_avg_last_3",
+    "pbp_target_share_avg_last_5",
     "deep_target_rate_avg_last_3",
     "deep_target_rate_avg_last_5",
     "red_zone_target_share_avg_last_3",
     "red_zone_target_share_avg_last_5",
+    "target_share_recency_5",
+    "red_zone_target_share_recency_5",
     "end_zone_targets_avg_last_5",
     "adot_avg_last_3",
     "adot_avg_last_5",
@@ -39,6 +48,7 @@ ADVANCED_FEATURE_COLUMNS = [
     *GAME_CONTEXT_COLUMNS,
     *QB_CONTEXT_COLUMNS,
     *USAGE_QUALITY_COLUMNS,
+        *NGS_RECEIVING_FEATURE_COLUMNS,
     *MATCHUP_FEATURE_COLUMNS,
 ]
 
@@ -296,12 +306,14 @@ def add_usage_quality_features(
     targets = play_by_play.filter(
         pl.col("receiver_player_id").is_not_null()
         & pl.col("posteam").is_not_null()
-        & pl.col("air_yards").is_not_null()
     ).with_columns(canonical_team("posteam").alias("team"))
     team_red_zone = (
         targets.filter(pl.col("yardline_100") <= 20)
         .group_by("game_id", "team")
         .agg(pl.len().alias("team_red_zone_targets"))
+    )
+    team_targets = targets.group_by("game_id", "team").agg(
+        pl.len().alias("team_pass_targets")
     )
     player_targets = (
         targets.group_by("game_id", "team", "receiver_player_id")
@@ -315,8 +327,10 @@ def add_usage_quality_features(
             pl.col("air_yards").mean().alias("adot"),
         )
         .join(team_red_zone, on=["game_id", "team"], how="left")
+        .join(team_targets, on=["game_id", "team"], how="left")
         .with_columns(
             (pl.col("deep_targets") / pl.col("pbp_targets")).alias("deep_target_rate"),
+            (pl.col("pbp_targets") / pl.col("team_pass_targets")).alias("target_share"),
             pl.when(pl.col("team_red_zone_targets") > 0)
             .then(pl.col("red_zone_targets") / pl.col("team_red_zone_targets"))
             .otherwise(0.0)
@@ -335,6 +349,7 @@ def add_usage_quality_features(
         .with_columns(
             pl.col("deep_target_rate").fill_null(0.0),
             pl.col("red_zone_target_share").fill_null(0.0),
+            pl.col("target_share").fill_null(0.0),
             pl.col("end_zone_targets").fill_null(0),
         )
         .sort(["player_id", "game_date", "game_id"])
@@ -346,6 +361,8 @@ def add_usage_quality_features(
                 .over("player_id")
                 .alias(name)
                 for source, window, name in [
+                    ("target_share", 3, "pbp_target_share_avg_last_3"),
+                    ("target_share", 5, "pbp_target_share_avg_last_5"),
                     ("deep_target_rate", 3, "deep_target_rate_avg_last_3"),
                     ("deep_target_rate", 5, "deep_target_rate_avg_last_5"),
                     ("red_zone_target_share", 3, "red_zone_target_share_avg_last_3"),
@@ -354,7 +371,9 @@ def add_usage_quality_features(
                     ("adot", 3, "adot_avg_last_3"),
                     ("adot", 5, "adot_avg_last_5"),
                 ]
-            ]
+            ],
+            prior_recency_mean("target_share", "player_id").alias("target_share_recency_5"),
+            prior_recency_mean("red_zone_target_share", "player_id").alias("red_zone_target_share_recency_5"),
         )
         .select("game_id", "player_id", *USAGE_QUALITY_COLUMNS)
         .unique(subset=["game_id", "player_id"], keep="last")
@@ -368,23 +387,33 @@ def add_advanced_features(
     player_games: pl.DataFrame,
     schedules: pl.DataFrame,
     play_by_play: pl.DataFrame,
+    nextgen_receiving: pl.DataFrame | None = None,
 ) -> pl.DataFrame:
     """Attach all advanced features using one historical/live contract."""
     if schedules.is_empty() or play_by_play.is_empty():
-        return player_games.with_columns(
+        base = player_games.with_columns(
             *[
                 pl.lit(None, dtype=pl.Float64).alias(column)
                 for column in ADVANCED_FEATURE_COLUMNS
+                if column not in player_games.columns
             ]
+        )
+        return add_nextgen_receiving_features(
+            base,
+            nextgen_receiving if nextgen_receiving is not None else pl.DataFrame(),
         )
     with_matchup = add_matchup_history_features(player_games, play_by_play)
     with_game = add_game_context_features(with_matchup, schedules)
     with_qb = add_qb_context_features(with_game, play_by_play)
     with_usage = add_usage_quality_features(with_qb, play_by_play)
-    return with_usage.with_columns(
+    with_nextgen = add_nextgen_receiving_features(
+        with_usage,
+        nextgen_receiving if nextgen_receiving is not None else pl.DataFrame(),
+    )
+    return with_nextgen.with_columns(
         *[
             pl.lit(None, dtype=pl.Float64).alias(column)
-            for column in MATCHUP_FEATURE_COLUMNS
-            if column not in with_usage.columns
+            for column in [*MATCHUP_FEATURE_COLUMNS, *NGS_RECEIVING_FEATURE_COLUMNS]
+            if column not in with_nextgen.columns
         ]
     )

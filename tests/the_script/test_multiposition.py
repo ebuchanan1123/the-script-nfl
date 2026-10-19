@@ -5,6 +5,8 @@ import polars as pl
 from the_script.features.advanced import ADVANCED_FEATURE_COLUMNS
 from the_script.features.coaching import QB_PLAYCALL_FEATURE_COLUMNS
 from the_script.features.matchup import MATCHUP_FEATURE_COLUMNS
+from the_script.features.nextgen import NGS_RECEIVING_FEATURE_COLUMNS
+from the_script.features.recency import EXPERIMENTAL_RECENCY_FEATURE_COLUMNS
 from the_script.models.multiposition import (
     POSITION_CONFIGS,
     add_position_form_features,
@@ -62,7 +64,12 @@ def test_required_multi_position_outcomes_and_features_are_configured() -> None:
         features = position_feature_columns(position)
         assert "snap_share_avg_last_3" in features
         assert len(features) == len(set(features))
-        assert set(ADVANCED_FEATURE_COLUMNS).issubset(features)
+        assert not set(EXPERIMENTAL_RECENCY_FEATURE_COLUMNS).intersection(features)
+        expected_advanced = set(ADVANCED_FEATURE_COLUMNS) - set(NGS_RECEIVING_FEATURE_COLUMNS)
+        assert not set(NGS_RECEIVING_FEATURE_COLUMNS).intersection(features)
+        assert "targets_recency_5" not in features
+        expected_advanced -= set(EXPERIMENTAL_RECENCY_FEATURE_COLUMNS)
+        assert expected_advanced.issubset(features)
         assert set(MATCHUP_FEATURE_COLUMNS).issubset(features)
     assert {
         "team_trailing_play_rate_avg_last_3",

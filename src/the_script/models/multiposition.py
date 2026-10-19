@@ -29,6 +29,14 @@ from the_script.features.advanced import (
 from the_script.features.coaching import QB_PLAYCALL_FEATURE_COLUMNS, add_qb_playcall_features
 from the_script.features.injuries import INJURY_FEATURE_COLUMNS, add_injury_features
 from the_script.features.matchup import add_matchup_history_features
+from the_script.features.nextgen import (
+    NGS_RECEIVING_FEATURE_COLUMNS,
+    add_nextgen_receiving_features,
+)
+from the_script.features.recency import (
+    EXPERIMENTAL_RECENCY_FEATURE_COLUMNS,
+    prior_recency_mean,
+)
 from the_script.features.role import normalize_depth_chart_assignments
 from the_script.models.preprocessing import NumericPreprocessor
 
@@ -133,6 +141,12 @@ def _rolling_feature_names(config: PositionModelConfig) -> list[str]:
 
 def position_feature_columns(position: str) -> list[str]:
     config = POSITION_CONFIGS[position]
+    advanced_columns = [
+        column
+        for column in ADVANCED_FEATURE_COLUMNS
+        if column not in set(NGS_RECEIVING_FEATURE_COLUMNS)
+        and column not in EXPERIMENTAL_RECENCY_FEATURE_COLUMNS
+    ]
     opponent_columns = [
         f"opponent_{outcome}_allowed_avg_last_{window}"
         for outcome in config.outcomes
@@ -148,7 +162,7 @@ def position_feature_columns(position: str) -> list[str]:
         "games_played_before_game",
         "home_game",
         "days_rest",
-        *ADVANCED_FEATURE_COLUMNS,
+        *advanced_columns,
         *INJURY_FEATURE_COLUMNS,
         *TEAM_TENDENCY_COLUMNS,
         *opponent_columns,
@@ -243,6 +257,11 @@ def add_position_form_features(frame: pl.DataFrame, position: str) -> pl.DataFra
     ]
     return ordered.with_columns(
         *rolling,
+        *(
+            [prior_recency_mean("targets", "player_id").alias("targets_recency_5")]
+            if position != "QB"
+            else []
+        ),
         pl.col("snap_share").shift(1).over("player_id").alias("snap_share_last_game"),
         pl.col("snap_share")
         .shift(1)
@@ -403,6 +422,7 @@ def add_position_context_features(
     depth_charts: pl.DataFrame,
     player_stats: pl.DataFrame | None = None,
     injuries: pl.DataFrame | None = None,
+    nextgen_receiving: pl.DataFrame | None = None,
 ) -> pl.DataFrame:
     """Attach pregame role, environment, usage, injury, and opponent context."""
     with_game = add_game_context_features(frame, schedules) if not schedules.is_empty() else frame
@@ -430,6 +450,11 @@ def add_position_context_features(
                 for column in ADVANCED_FEATURE_COLUMNS
                 if column not in with_advanced.columns
             ]
+        )
+    if position in {"WR", "TE"}:
+        with_advanced = add_nextgen_receiving_features(
+            with_advanced,
+            nextgen_receiving if nextgen_receiving is not None else pl.DataFrame(),
         )
     with_opp = _add_opponent_allowed(with_advanced, position)
     with_role = _add_rb_carry_share(with_opp, position)
@@ -469,6 +494,9 @@ def build_position_features_from_parquet(
         pl.read_parquet(raw_directory / "depth_charts.parquet"),
         pl.read_parquet(raw_directory / "player_stats.parquet"),
         pl.read_parquet(raw_directory / "injuries.parquet"),
+        pl.read_parquet(raw_directory / "nextgen_receiving.parquet")
+        if (raw_directory / "nextgen_receiving.parquet").exists()
+        else pl.DataFrame(),
     )
     output_directory.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(output_directory / f"{position.lower()}_player_features.parquet")
@@ -743,6 +771,8 @@ def predict_live_position(
         raise ValueError(
             f"Could not uniquely resolve {player_name}: IDs={player_ids}, team={resolved_team}"
         )
+    ngs_loader = getattr(nfl, "load_nextgen_receiving_optional", None)
+    nextgen_receiving = ngs_loader(list(range(2016, season + 1))) if ngs_loader else pl.DataFrame()
     completed = build_position_player_games(
         stats,
         schedules,
@@ -783,6 +813,7 @@ def predict_live_position(
         nfl.load_depth_charts([season]),
         stats,
         nfl.load_injuries([season]),
+        nextgen_receiving,
     ).filter(pl.col("game_id") == upcoming[0, "game_id"])
     comparison = json.loads(
         (models_directory / position.lower() / "comparison.json").read_text()
@@ -1012,6 +1043,8 @@ def predict_position_rankings(
     config = POSITION_CONFIGS[position]
     schedules = nfl.load_schedules([season])
     play_by_play = nfl.load_pbp([season - 1, season])
+    ngs_loader = getattr(nfl, "load_nextgen_receiving_optional", None)
+    nextgen_receiving = ngs_loader(list(range(2016, season + 1))) if ngs_loader else pl.DataFrame()
     depth_charts = nfl.load_depth_charts([season])
     stats = nfl.load_player_stats([season], summary_level="week")
     players = position_ranking_candidates(
@@ -1087,6 +1120,7 @@ def predict_position_rankings(
                 schedules,
                 play_by_play,
                 depth_charts,
+                nextgen_receiving=nextgen_receiving,
             )
             .filter(pl.col("game_id").is_in(upcoming["game_id"]))
             .join(

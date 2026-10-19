@@ -7,6 +7,7 @@ import polars as pl
 from the_script.features.advanced import add_advanced_features
 from the_script.features.injuries import add_injury_features
 from the_script.features.opponent import add_opponent_wr_features
+from the_script.features.recency import prior_recency_mean
 from the_script.features.role import add_role_features
 from the_script.features.tendencies import add_team_tendency_features
 
@@ -18,6 +19,7 @@ PLAYER_FEATURE_COLUMNS = [
 	"targets_avg_last_3",
 	"targets_avg_last_5",
 	"targets_avg_last_16",
+	"targets_recency_5",
 	"target_share_last_game",
 	"target_share_avg_last_3",
 	"target_share_avg_last_5",
@@ -75,6 +77,7 @@ def add_player_form_features(player_games: pl.DataFrame) -> pl.DataFrame:
 		_prior_rolling_mean("targets", 3, "player_id").alias("targets_avg_last_3"),
 		_prior_rolling_mean("targets", 5, "player_id").alias("targets_avg_last_5"),
 		_prior_rolling_mean("targets", 16, "player_id").alias("targets_avg_last_16"),
+		prior_recency_mean("targets", "player_id").alias("targets_recency_5"),
 		pl.col("target_share").shift(1).over("player_id").alias("target_share_last_game"),
 		_prior_rolling_mean("target_share", 3, "player_id").alias("target_share_avg_last_3"),
 		_prior_rolling_mean("target_share", 5, "player_id").alias("target_share_avg_last_5"),
@@ -104,6 +107,7 @@ def build_player_features_from_parquet(
 	play_by_play_path: Path = Path("data/raw/play_by_play.parquet"),
 	schedules_path: Path = Path("data/raw/schedules.parquet"),
 	injuries_path: Path = Path("data/raw/injuries.parquet"),
+	nextgen_path: Path = Path("data/raw/nextgen_receiving.parquet"),
 ) -> pl.DataFrame:
 	"""Build and persist shifted player features separately from the canonical table."""
 	player_games = pl.read_parquet(input_path)
@@ -123,10 +127,12 @@ def build_player_features_from_parquet(
 		pl.read_parquet(player_stats_path),
 		pl.read_parquet(injuries_path),
 	)
+	ngs = pl.read_parquet(nextgen_path) if nextgen_path.exists() else pl.DataFrame()
 	with_advanced = add_advanced_features(
 		with_injuries,
 		pl.read_parquet(schedules_path),
 		pl.read_parquet(play_by_play_path),
+		ngs,
 	)
 	featured = add_opponent_wr_features(with_advanced)
 	output_path.parent.mkdir(parents=True, exist_ok=True)

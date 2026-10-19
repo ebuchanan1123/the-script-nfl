@@ -16,6 +16,7 @@ CORE_FILES = {
     "depth_charts": "depth_charts.parquet",
     "play_by_play": "play_by_play.parquet",
     "injuries": "injuries.parquet",
+    "nextgen_receiving": "nextgen_receiving.parquet",
 }
 
 
@@ -47,6 +48,7 @@ def download_core_data(
         "depth_charts": lambda: nfl.load_depth_charts(requested),
         "play_by_play": lambda: nfl.load_pbp(requested),
         "injuries": lambda: nfl.load_injuries(requested),
+        "nextgen_receiving": lambda: nfl.load_nextgen_stats(requested, stat_type="receiving"),
     }
     schemas = {}
     for name, loader in loaders.items():

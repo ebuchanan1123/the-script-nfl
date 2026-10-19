@@ -54,6 +54,17 @@ def load_player_stats(seasons: list[int], *, summary_level: str = "week") -> pl.
 def load_pbp(seasons: list[int]) -> pl.DataFrame:
     return _load("load_pbp", seasons)
 
+def load_nextgen_receiving(seasons: list[int]) -> pl.DataFrame:
+    return _load("load_nextgen_stats", seasons, stat_type="receiving")
+
+
+def load_nextgen_receiving_optional(seasons: list[int]) -> pl.DataFrame:
+    try:
+        return load_nextgen_receiving(seasons)
+    except ConnectionError:
+        LOGGER.warning("Next Gen receiving metrics unavailable; using null features")
+        return pl.DataFrame()
+
 
 def load_snap_counts(seasons: list[int]) -> pl.DataFrame:
     return _load("load_snap_counts", seasons)

@@ -82,7 +82,12 @@ def _fresh_sources(season: int, allow_stale: bool):
             return frames[key]
         path = _snapshot_path(name, seasons, kwargs)
         before = path.stat().st_mtime_ns if path.exists() else None
-        frame = original(name, seasons, force_refresh=True, **kwargs)
+        try:
+            frame = original(name, seasons, force_refresh=True, **kwargs)
+        except ConnectionError:
+            if not allow_stale or name != "load_nextgen_stats" or kwargs.get("stat_type") != "receiving":
+                raise
+            frame = pl.DataFrame()
         after = path.stat().st_mtime_ns if path.exists() else None
         stale = after is None or after == before
         timestamp = (
@@ -204,6 +209,7 @@ def export_release(output: Path = PROJECT_ROOT / "frontend/public/data", *,
                 health = {**health, "current_week": week}
                 if health.get("latest_completed_week") is None:
                     raise ExportError("No completed player data is available")
+                live.load_nextgen_receiving(list(range(2016, season + 1)))
                 schedule = live.load_schedules([season])
                 for projection_week in weeks:
                     games = schedule.filter(

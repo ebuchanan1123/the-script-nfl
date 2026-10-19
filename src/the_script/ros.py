@@ -121,6 +121,8 @@ def predict_ros_rankings(
     historical = pl.read_parquet(historical_path)
     play_by_play = nfl.load_pbp([season - 1, season])
     injuries = nfl.load_injuries([season])
+    ngs_loader = getattr(nfl, "load_nextgen_receiving_optional", None)
+    nextgen_receiving = ngs_loader(list(range(2016, season + 1))) if ngs_loader else pl.DataFrame()
     upcoming_by_week: dict[int, list[pl.DataFrame]] = {}
     metadata = []
     for player in players.iter_rows(named=True):
@@ -164,6 +166,7 @@ def predict_ros_rankings(
                 play_by_play=play_by_play,
                 schedules=schedules,
                 injuries=injuries,
+                nextgen_receiving=nextgen_receiving,
             ).with_columns(pl.lit(next_week).alias("projection_week"))
         )
     features = pl.concat(feature_groups, how="vertical_relaxed").join(

@@ -8,6 +8,8 @@ import polars as pl
 
 from the_script.data.build_dataset import build_wr_player_games_from_parquet
 from the_script.data.download import download_core_data
+from the_script.evaluation.recency_backtest import run_nextgen_backtest, run_recency_backtest
+from the_script.evaluation.wr_rolling import evaluate_rolling_validation
 from the_script.features.player import build_player_features_from_parquet
 from the_script.models.baseline import evaluate_recent_average_from_parquet
 from the_script.models.ensemble import evaluate_yards_challengers
@@ -65,6 +67,9 @@ def _parser() -> argparse.ArgumentParser:
     features.add_argument(
         "--injuries", type=Path, default=Path("data/raw/injuries.parquet")
     )
+    features.add_argument(
+        "--nextgen", type=Path, default=Path("data/raw/nextgen_receiving.parquet")
+    )
     inspect = commands.add_parser("inspect-wr-table")
     inspect.add_argument("--input", type=Path, default=Path("data/processed/wr_player_games.parquet"))
     inspect.add_argument("--rows", type=int, default=10)
@@ -120,6 +125,34 @@ def _parser() -> argparse.ArgumentParser:
         "--input", type=Path, default=Path("data/processed/wr_player_features.parquet")
     )
     ensemble.add_argument("--models-directory", type=Path, default=Path("models"))
+    rolling_eval = commands.add_parser("evaluate-wr-rolling-validation")
+    rolling_eval.add_argument(
+        "--predictions", type=Path,
+        default=Path("models/wr_ensemble/validation_predictions.parquet"),
+    )
+    recency_eval = commands.add_parser("backtest-recency-features")
+    recency_eval.add_argument(
+        "--positions", nargs="+", choices=("WR", "RB", "TE"), default=("WR", "RB", "TE")
+    )
+    recency_eval.add_argument(
+        "--processed-directory", type=Path, default=Path("data/processed")
+    )
+    recency_eval.add_argument("--models-directory", type=Path, default=Path("models"))
+    recency_eval.add_argument(
+        "--output", type=Path, default=Path("models/recency_backtest.json")
+    )
+    nextgen_eval = commands.add_parser("backtest-nextgen-features")
+    nextgen_eval.add_argument("--positions", nargs="+", choices=("WR", "TE"), default=("WR", "TE"))
+    nextgen_eval.add_argument("--processed-directory", type=Path, default=Path("data/processed"))
+    nextgen_eval.add_argument("--models-directory", type=Path, default=Path("models"))
+    nextgen_eval.add_argument("--output", type=Path, default=Path("models/nextgen_backtest.json"))
+    rolling_eval.add_argument(
+        "--features", type=Path, default=Path("data/processed/wr_player_features.parquet")
+    )
+    rolling_eval.add_argument(
+        "--output", type=Path,
+        default=Path("models/wr_ensemble/rolling_validation_diagnostics.json"),
+    )
     build_positions = commands.add_parser("build-position-features")
     build_positions.add_argument(
         "--position", choices=sorted(POSITION_CONFIGS), required=True
@@ -191,6 +224,7 @@ def main() -> None:
             play_by_play_path=args.play_by_play,
             schedules_path=args.schedules,
             injuries_path=args.injuries,
+            nextgen_path=args.nextgen,
         )
         print(f"wrote {frame.height:,} rows with shifted player features to {args.output}")
     elif args.command == "inspect-wr-table":
@@ -266,6 +300,39 @@ def main() -> None:
                 f"{split_name}: MAE={metrics['mae']:.3f}, "
                 f"RMSE={metrics['rmse']:.3f}"
             )
+    elif args.command == "evaluate-wr-rolling-validation":
+        results = evaluate_rolling_validation(args.predictions, args.features, args.output)
+        print(json.dumps(results, indent=2))
+    elif args.command == "backtest-recency-features":
+        results = run_recency_backtest(
+            processed_directory=args.processed_directory,
+            models_directory=args.models_directory,
+            positions=tuple(args.positions),
+            output_path=args.output,
+        )
+        for position, outcomes in results["positions"].items():
+            for target, experiment in outcomes.items():
+                validation = experiment["splits"]["validation"]
+                print(
+                    f"{position} {target}: baseline MAE={validation['baseline']['mae']:.3f}, "
+                    f"recency MAE={validation['recency']['mae']:.3f}, "
+                    f"delta={validation['mae_delta_recency_minus_baseline']:+.3f}"
+                )
+    elif args.command == "backtest-nextgen-features":
+        results = run_nextgen_backtest(
+            processed_directory=args.processed_directory,
+            models_directory=args.models_directory,
+            positions=tuple(args.positions),
+            output_path=args.output,
+        )
+        for position, outcomes in results["positions"].items():
+            for target, experiment in outcomes.items():
+                validation = experiment["splits"]["validation"]
+                print(
+                    f"{position} {target}: baseline MAE={validation['baseline']['mae']:.3f}, "
+                    f"NGS MAE={validation['nextgen']['mae']:.3f}, "
+                    f"delta={validation['mae_delta_nextgen_minus_baseline']:+.3f}"
+                )
     elif args.command == "build-position-features":
         frame = build_position_features_from_parquet(
             args.raw_directory, args.output_directory, args.position

@@ -1,75 +1,44 @@
-# React + TypeScript + Vite
+# The Script Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React, TypeScript, and Vite dashboard for exploring NFL player forecasts, weekly/ROS rankings,
+player trends, and model evaluation metrics.
 
-Currently, two official plugins are available:
+## Local development
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+From the repository root, install the Python dependencies and frontend packages, then run the API and
+Vite development server in separate terminals:
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+uv sync --extra data --extra baseline --extra neural --extra api --extra dev
+npm --prefix frontend ci
+uv run the-script-api
+npm --prefix frontend run dev -- --host 127.0.0.1
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+The frontend expects FastAPI at `http://127.0.0.1:8000/api` by default. Set `VITE_API_URL` to
+override the API base URL.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Static forecast mode
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Static mode reads a versioned JSON release instead of calling FastAPI for player search, forecasts,
+rankings, injuries, and metrics. Enable it at build time with:
 
+```bash
+VITE_DATA_MODE=static npm run build
+```
+
+The data manifest is read from `/data/manifest.json` by default. Override its base directory using
+`VITE_DATA_URL`. Generate releases from the repository root with
+`uv run python -m the_script.static_export`. Releases contain model inputs' derived forecasts and
+metadata, not source Parquet files or model binaries. The manifest is replaced only after a complete
+release is generated, so a failed export does not expose a partial release.
+
+Do not publish a `--limit` smoke-test release as a production season: those releases are marked
+`preview_only` and contain only a subset of players. The exporter also refuses unverified stale
+sources unless `--allow-stale` is explicitly passed for local preview use.
+
+## Build checks
+
+```bash
+npm --prefix frontend run build
 ```

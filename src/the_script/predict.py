@@ -140,6 +140,7 @@ def build_live_feature_rows(
 	play_by_play: pl.DataFrame | None = None,
 	schedules: pl.DataFrame | None = None,
 	injuries: pl.DataFrame | None = None,
+	nextgen_receiving: pl.DataFrame | None = None,
 ) -> pl.DataFrame:
 	"""Append outcome-null future rows and derive shifted pregame features."""
 	all_games = pl.concat(
@@ -172,6 +173,7 @@ def build_live_feature_rows(
 		with_injuries,
 		schedules if schedules is not None else pl.DataFrame(),
 		play_by_play if play_by_play is not None else pl.DataFrame(),
+		nextgen_receiving,
 	)
 	featured = add_opponent_wr_features(with_advanced)
 	keys = upcoming_rows.select("game_id", "player_id").unique()
@@ -189,6 +191,7 @@ def build_live_feature_row(
 	play_by_play: pl.DataFrame | None = None,
 	schedules: pl.DataFrame | None = None,
 	injuries: pl.DataFrame | None = None,
+	nextgen_receiving: pl.DataFrame | None = None,
 ) -> pl.DataFrame:
 	"""Build one live feature row through the shared batched implementation."""
 	return build_live_feature_rows(
@@ -200,6 +203,7 @@ def build_live_feature_row(
 		play_by_play=play_by_play,
 		schedules=schedules,
 		injuries=injuries,
+		nextgen_receiving=nextgen_receiving,
 	)
 
 
@@ -375,6 +379,8 @@ def predict_live_wr(
 	depth_charts = nfl.load_depth_charts([season])
 	play_by_play = nfl.load_pbp(lookup_seasons)
 	injuries = nfl.load_injuries([season])
+	ngs_loader = getattr(nfl, "load_nextgen_receiving_optional", None)
+	nextgen_receiving = ngs_loader(list(range(2016, season + 1))) if ngs_loader else pl.DataFrame()
 	features = build_live_feature_row(
 		historical,
 		completed,
@@ -384,6 +390,7 @@ def predict_live_wr(
 		play_by_play=play_by_play,
 		schedules=schedules,
 		injuries=injuries,
+		nextgen_receiving=nextgen_receiving,
 	)
 	predictions = predict_model_artifacts(models_directory, features)
 	volume_predictions = predict_volume_artifacts(models_directory, features)

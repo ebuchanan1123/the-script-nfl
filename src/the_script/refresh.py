@@ -54,6 +54,7 @@ def refresh_data(project_root: Path, on_refreshed: Callable[[], None] | None = N
         ("load_player_stats", [season - 1, season], {"summary_level": "week"}),
         ("load_pbp", [season], {}),
         ("load_pbp", [season - 1, season], {}),
+        ("load_nextgen_stats", list(range(2016, season + 1)), {"stat_type": "receiving"}),
         ("load_snap_counts", [season], {}),
         ("load_depth_charts", [season], {}),
         ("load_injuries", [season], {}),

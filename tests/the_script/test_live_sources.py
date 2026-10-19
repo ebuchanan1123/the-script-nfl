@@ -41,6 +41,14 @@ def test_outage_reuses_expired_snapshot_but_not_another_season(tmp_path, monkeyp
         live.load_schedules([2027])
 
 
+def test_optional_nextgen_source_returns_empty_when_unavailable(monkeypatch) -> None:
+    def unavailable(*args, **kwargs):
+        raise ConnectionError("source offline")
+
+    monkeypatch.setattr(live, "_load", unavailable)
+    assert live.load_nextgen_receiving_optional([2024]).is_empty()
+
+
 def test_forced_refresh_bypasses_fresh_snapshot(tmp_path, monkeypatch) -> None:
     monkeypatch.setattr(live, "CACHE_DIRECTORY", tmp_path)
     old = pl.DataFrame({"week": [4]})

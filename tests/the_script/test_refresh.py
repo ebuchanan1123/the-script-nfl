@@ -39,7 +39,7 @@ def test_refresh_forces_sources_and_invalidates_rankings(tmp_path, monkeypatch):
     monkeypatch.setattr("nflreadpy.cache.clear_cache", Mock())
     callback = Mock()
     assert refresh.refresh_data(tmp_path, callback)
-    assert loader.call_count == 9
+    assert loader.call_count == 10
     assert all(call.kwargs["force_refresh"] for call in loader.call_args_list)
     assert not stale.exists()
     assert unrelated.exists()
@@ -47,11 +47,11 @@ def test_refresh_forces_sources_and_invalidates_rankings(tmp_path, monkeypatch):
 
 
 def test_source_failure_does_not_stop_other_sources(tmp_path, monkeypatch):
-    loader = Mock(side_effect=[ConnectionError("offline"), *([None] * 8)])
+    loader = Mock(side_effect=[ConnectionError("offline"), *([None] * 9)])
     monkeypatch.setattr(refresh.live, "_load", loader)
     monkeypatch.setattr(refresh, "_run", Mock(return_value=True))
     monkeypatch.setattr("nflreadpy.cache.clear_cache", Mock())
     callback = Mock()
     assert not refresh.refresh_data(tmp_path, callback)
-    assert loader.call_count == 9
+    assert loader.call_count == 10
     callback.assert_called_once()
